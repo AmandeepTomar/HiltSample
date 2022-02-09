@@ -1,19 +1,29 @@
 package com.amandeep.hiltsample
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.amandeep.hiltsample.databinding.FragmentFirstBinding
+import com.amandeep.hiltsample.hilt.sample.scoped.FragmentScopedSample
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
+
+@AndroidEntryPoint
 class FirstFragment : Fragment() {
 
+    private val TAG="FirstFragment"
+
     private var _binding: FragmentFirstBinding? = null
+
+    @Inject lateinit var fragmentScopedSample: FragmentScopedSample
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -31,6 +41,8 @@ class FirstFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        Log.e(TAG, "onViewCreated: ${fragmentScopedSample.getScopedFunction()}" )
 
         binding.buttonFirst.setOnClickListener {
             findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)

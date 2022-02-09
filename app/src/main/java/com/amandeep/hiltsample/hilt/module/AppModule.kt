@@ -1,7 +1,7 @@
-package com.amandeep.hiltsample.hilt.demo
+package com.amandeep.hiltsample.hilt.module
 
 import com.amandeep.hiltsample.hilt.Person
-import com.google.gson.annotations.Since
+import com.amandeep.hiltsample.hilt.interfaceproblemwithinject.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,5 +16,11 @@ class AppModule {
     @Singleton
     fun provideDataBase(): Person {
         return Person()
+    }
+
+    @Provides
+    @Singleton
+    fun getDependencyImpl():SomeInterface{
+        return SomeInterfaceImpl()
     }
 }

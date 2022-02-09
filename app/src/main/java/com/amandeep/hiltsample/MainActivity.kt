@@ -1,6 +1,5 @@
 package com.amandeep.hiltsample
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import com.google.android.material.snackbar.Snackbar
@@ -14,9 +13,13 @@ import android.view.MenuItem
 import com.amandeep.hiltsample.databinding.ActivityMainBinding
 import com.amandeep.hiltsample.hilt.Car
 import com.amandeep.hiltsample.hilt.Person
+import com.amandeep.hiltsample.hilt.interfaceproblemwithinject.Bike
+import com.amandeep.hiltsample.hilt.interfaceproblemwithinject.SomeInterfaceImpl
+import com.amandeep.hiltsample.hilt.interfaceproblemwithinject.Vehicle
 import com.amandeep.hiltsample.hilt.sample.People
-import com.amandeep.hiltsample.nonHiltClass.NonHiltClassEntryPoint
-import dagger.hilt.EntryPoints
+import com.amandeep.hiltsample.hilt.sample.scoped.ActivityScopedSample
+import com.amandeep.hiltsample.hilt.sample.scoped.FragmentScopedSample
+import com.amandeep.hiltsample.hilt.sample.scoped.ScopedSample
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -29,6 +32,13 @@ class MainActivity : AppCompatActivity() {
     @Inject lateinit var car: Car
     @Inject lateinit var person: Person // called from @Module
     @Inject lateinit var people: People // field injection
+    @Inject lateinit var scopedSample: ScopedSample
+    @Inject lateinit var activityScoped: ActivityScopedSample
+    @Inject lateinit var vehicle: Vehicle
+    @Inject lateinit var someInterfaceImpl: SomeInterfaceImpl
+
+    // this can be using in Fargment only
+  //  @Inject lateinit var fargmentScopedSample: FragmentScopedSample
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,6 +57,12 @@ class MainActivity : AppCompatActivity() {
 
         Log.e(TAG, "onCreate:people info ${people.getPeopleInformation()}")
         Log.e(TAG, "onCreate:people Address ${people.getPeopleAddress()}")
+
+        Log.e(TAG, "onCreate: Application scope ${scopedSample.getScopedFunction()}")
+        Log.e(TAG, "onCreate: Activity scope ${activityScoped.getScopedFunction()}")
+
+        Log.e(TAG, "onCreate: getVehicle = ${vehicle.getVehicleDetails()}")
+        Log.e(TAG, "onCreate: some Object dependency = ${someInterfaceImpl.getDetails()}")
 
         binding.fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action ${car.getCar()}", Snackbar.LENGTH_LONG)

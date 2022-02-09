@@ -14,6 +14,7 @@ import javax.inject.Inject
 
 class NonHiltClassEntryPoint @Inject constructor(){
 
+// todo need to complete this one , it is incomplete as of now
     @EntryPoint
     @InstallIn(ActivityComponent::class)
      interface NonHiltClassEntrypointInterface{
