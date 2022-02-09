@@ -1,7 +1,9 @@
 package com.amandeep.hiltsample.nonHiltClass
 
+import javax.inject.Inject
 
-class Book {
+
+class Book @Inject constructor() {
 
     fun getBookName():String="BookName"
 }

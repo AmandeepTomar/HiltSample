@@ -14,6 +14,7 @@ import android.view.MenuItem
 import com.amandeep.hiltsample.databinding.ActivityMainBinding
 import com.amandeep.hiltsample.hilt.Car
 import com.amandeep.hiltsample.hilt.Person
+import com.amandeep.hiltsample.hilt.sample.People
 import com.amandeep.hiltsample.nonHiltClass.NonHiltClassEntryPoint
 import dagger.hilt.EntryPoints
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,13 +22,13 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-
+    private val TAG="mainActivityTag"
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
     @Inject lateinit var car: Car
-    @Inject lateinit var person: Person
-    @Inject lateinit var nonHiltClassEntryPoint: NonHiltClassEntryPoint
+    @Inject lateinit var person: Person // called from @Module
+    @Inject lateinit var people: People // field injection
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +44,9 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
 
         Log.i("TAG", "onCreate: ${person.getPersonName()}")
-            getBothClass(this.applicationContext)
+
+        Log.e(TAG, "onCreate:people info ${people.getPeopleInformation()}")
+        Log.e(TAG, "onCreate:people Address ${people.getPeopleAddress()}")
 
         binding.fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action ${car.getCar()}", Snackbar.LENGTH_LONG)
@@ -77,13 +80,13 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    fun getBothClass(context: Context){
-        val infetface=
-            EntryPoints.get(context, NonHiltClassEntryPoint.NonHiltClassEntrypointInterface::class.java)
-        val book= infetface.getBook()
-        val item=infetface.getItem()
-        Log.e("TAG", "getBothClass: Book ${book.getBookName()}" )
-        Log.e("TAG", "getBothClass: Item  ${item.getItemName()}" )
-
-    }
+//    fun getBothClass(context: Context){
+//        val infetface=
+//            EntryPoints.get(context, NonHiltClassEntryPoint.NonHiltClassEntrypointInterface::class.java)
+//        val book= infetface.getBook()
+//        val item=infetface.getItem()
+//        Log.e("TAG", "getBothClass: Book ${book.getBookName()}" )
+//        Log.e("TAG", "getBothClass: Item  ${item.getItemName()}" )
+//
+//    }
 }

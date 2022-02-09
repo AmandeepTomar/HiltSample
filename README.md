@@ -51,6 +51,98 @@ Hilt Dependency Injection
 ```
 
 
+### Notes
+- We have field injection and constructor injection
+- We have to use the constructor injection over the field injection
+    - Why ?
+        - When you use constructor injection that means , you provide the dependency at the time of creating the  instance of object , so we know exactly what this object required , or its east to test also we can mock the dependency.
+
+    ```
+        // field injection
+         @Inject
+         lateinit var Someclass:Someclass
+
+// constructor injection passing through the constructor
+         class Someclass
+         @Inject
+         constructor(private someOtherClass:SomeOtherClass){
+           fun functionOne():String="This one from SomeClass"
+
+           fun getSomeOtherClass():String= someOtherClass.functionOne()
+
+         }
+
+         class SomeOtherClass
+         @Inject
+         constructor(){
+            fun functionOne():String="This one from SomeOtherClass"
+         }
+    ```
+#### Hilt Scoping
+
+- never define or instantiate Dagger components directly. Instead
+- have predefined components
+- Hilt comes with a built-in set of components (and corresponding scope annotations) that are automatically integrated into the various lifecycles of an Android application
+ 
+```   
+    Component           	    Injector for
+    SingletonComponent	            Application
+    ViewModelComponent	            ViewModel
+    ActivityComponent	            Activity
+    FragmentComponent	            Fragment
+    ViewComponent	                View
+    ViewWithFragmentComponent	    View with @WithFragmentBindings
+    ServiceComponent	            Service
+```   
+
+```
+        Component	                Scope	                        Created at	                    Destroyed at
+        SingletonComponent	        @Singleton	                Application#onCreate()	        Application#onDestroy()
+        ActivityRetainedComponent	@ActivityRetainedScoped	    Activity#onCreate()1	        Activity#onDestroy()1
+        ViewModelComponent	        @ViewModelScoped	        ViewModel created	            ViewModel destroyed
+        ActivityComponent	        @ActivityScoped	            Activity#onCreate()         	Activity#onDestroy()
+        FragmentComponent	        @FragmentScoped	            Fragment#onAttach()	            Fragment#onDestroy()
+        ViewComponent	            @ViewScoped	                View#super()	                View destroyed
+        ViewWithFragmentComponent	@ViewScoped	                View#super()	                View destroyed
+        ServiceComponent	        @ServiceScoped	Service#onCreate()	Service#onDestroy()
+       
+```
+
+### Scoped vs unscoped bindings
+
+- By default, all bindings in Dagger are “unscoped”. This means that each time the binding is requested, Dagger will create a new instance of the binding.
+- A scoped binding will only be created once per instance of the component it’s scoped to, and all requests for that binding will share the same instance.
+
+```aidl
+
+            // This binding is "unscoped".
+        // Each request for this binding will get a new instance.
+        class UnscopedBinding @Inject constructor() {
+        }
+        
+        // This binding is "scoped".
+        // Each request from the same component instance for this binding will
+        // get the same instance. Since this is the fragment component, this means
+        // each request from the same fragment.
+        @FragmentScoped
+        class ScopedBinding @Inject constructor() {
+        }
+```
+- <B>Note</B> A common misconception is that all fragment instances will share the same instance of a binding scoped with @FragmentScoped. However, this is not true. Each fragment instance gets a new instance of the fragment component, and thus a new instance of all its scoped bindings.
+
+#### Component default bindings
+
+        Component	                    Default Bindings
+        SingletonComponent	                Application2
+        ActivityRetainedComponent	        Application
+        ViewModelComponent	                SavedStateHandle
+        ActivityComponent	                Application, Activity
+        FragmentComponent	                Application, Activity, Fragment
+        ViewComponent	                    Application, Activity, View
+        ViewWithFragmentComponent	        Application, Activity, Fragment, View
+        ServiceComponent	                Application, Service
+
+
 
 #### Hilt and dagger under the hood
 
