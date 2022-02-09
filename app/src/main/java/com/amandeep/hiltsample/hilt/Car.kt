@@ -5,7 +5,8 @@ import javax.inject.Inject
 
 class Car @Inject constructor() {
 
-    fun getCar(){
+    fun getCar(): String {
         Log.d("Car", "getCar: car is running...")
+        return "car is running..."
     }
 }
