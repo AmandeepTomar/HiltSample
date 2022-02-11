@@ -12,5 +12,8 @@ class Vehicle
 @Inject
 constructor(private val engine:Engine){
 
-    fun getVehicleDetails():String="Vehicle Details are:  ${engine.getEngine()} and having ${engine.getWheel()}"
+    fun getCarDetails():String="Vehicle Details are:  ${engine.getEngine()} and having ${engine.getWheel()}"
+
+    fun getBikeDetails():String="Vehicle Details are:  ${engine.getEngine()} and having ${engine.getWheel()}"
+
 }

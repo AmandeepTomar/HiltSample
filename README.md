@@ -182,6 +182,7 @@ Hilt Dependency Injection
         - Providers can only be scoped if all of the components support the same scope annotation.
         - Providers can only inject bindings if all of the components have access to those bindings.
         - A child and ancestor component should not install the same module
+
 - @HiltViewModel
     - ```
             @Module
@@ -243,9 +244,8 @@ Hilt Dependency Injection
 - Best Practice
 
 ```
-    class MyClass : NonHiltLibraryClass() {
-
-      @EntryPoint
+   
+     @EntryPoint
       @InstallIn(SingletonComponent::class)
       interface MyClassInterface {
         fun getFoo(): Foo
@@ -253,14 +253,77 @@ Hilt Dependency Injection
         fun getBar(): Bar
       }
 
+    
+        // Call this inside Activity and rest is done.
       fun doSomething(context: Context) {
         val myClassInterface =
             EntryPoints.get(applicationContext, MyClassInterface::class.java)
         val foo = myClassInterface.getFoo()
         val bar = myClassInterface.getBar()
       }
-    }
+    
 ```
+
+### Custom component
+
+- there may be situations where the standard Hilt components do not match the object lifetimes or needs of a particular feature.
+- Adding a custom component has the following drawbacks:
+    - Each component/scope adds cognitive overhead.
+    - Custom components work against standardization. The more custom components are used, the harder it is for shared libraries.
+    - Components can have only one parent . Reaches in Diamond problem.
+    
+- Criteria for deciding the use of custom 
+    - The component has a well-defined lifetime associated with it. 
+    - The concept of the component is well-understood and widely applicable. Hilt components are global to the app so the concepts should be applicable everywhere. Being globally understood also combats some of the issues with cognitive overhead.
+    - Consider if a non-Hilt (regular Dagger) component is sufficient. For components with a limited purpose sometimes it is better to use a non-Hilt component. For example, consider a production component that represents a single background task. Hilt components excel in situations where code needs to be contributed from possibly disjoint/modular code. If your component isn’t really meant to be extensible, it may not be a good match for a Hilt custom component.
+- Custom component limitations
+    - Components must be a direct or indirect child of the SingletonComponent.
+    - Components may not be inserted between any of the standard components. For example, a component cannot be added between the ActivityComponent and the FragmentComponent.
+    
+### Adding a custom Hilt component
+
+- create a class annotated with `@DefineComponent.`  This will be the class used in` @InstallIn` annotations.
+    - ```kotlin
+                @DefineComponent(parent = SingletonComponent::class)
+                interface MyCustomComponent{}
+        ```  
+- A builder interface must also be defined
+- f this builder is missing, the component will not be generated since there will be no way to construct the component.
+- This interface will be injectable from the parent component and will be the interface for creating new instances of your component
+- Once the component instance generated , now its your job to hold or release.
+
+
+
+```kotlin
+    @DefineComponent.Builder
+    interface MyCustomComponentBuilder {
+        fun fooSeedData(@BindsInstance foo: Foo): MyCustomComponentBuilder
+        fun build(): MyCustomComponent
+    }
+```     
+
+```kotlin
+    @EntryPoint
+    @InstallIn(MyCustomComponent::class)
+    interface MyCustomEntryPoint {
+        fun getBar(): Bar
+    }
+
+    class CustomComponentManager @Inject constructor(
+        componentBuilder: MyCustomComponentBuilder) {
+    
+        fun doSomething(foo: Foo) {
+            val component = componentBuilder.fooSeedData(foo).build();
+            val bar = EntryPoints.get(component, MyCustomEntryPoint::class.java).getBar()
+
+        }   // Don't forget to hold on to the component instance if you need to!
+        }
+```
+
+ 
+      
+
+
 
 
 - Hilt Gradle Plugin
@@ -270,6 +333,47 @@ Hilt Dependency Injection
         - Less error
         - Better Performance
         - Better Encapsulation
+    
+
+- Q: If we have two same type of object inject into two different activity then how we going to tell them that which one use in which activity.
+- And: 
+        - Wrong one 
+            - create interface 
+            - Create two impl1 and impl2 class using interface 
+            - Create anothewr class that returning the both impl with same return type as interface
+            - Provide @Provides in @Module 
+            - As we compile we get the error like ` is bound multiple times:`
+        - Now `@Qualifer()` comes in the picture to rescue 
+            - It is used to create custom annotations 
+            - Create custom annotations.
+            - ```
+                  public enum class AnnotationRetention {
+                  /** Annotation isn't stored in binary output */
+                  SOURCE,
+                  /** Annotation is stored in binary output, but invisible for reflection */
+                  BINARY,
+                  /** Annotation is stored in binary output and visible for reflection (default retention) */
+                  RUNTIME
+            ```
+                ```
+                    @Qualifier
+                    @Retention(AnnotationRetention.BINARY)
+                    annotation class Impl1
+                    
+                    @Qualifier
+                    @Retention(AnnotationRetention.BINARY)
+                    annotation class Impl2
+                ```
+            - Now provide @Imp1 and @impl2 in @provides methods to tell module ., which one is going to provide the which one impl.
+            - Also tell constractor the thet @impl1 and @impl2.
+            - All set
+
+- If you are using Hilt @Inject in any Fragment that is Host by activity A than Activity A must need to use the @AndroidEntryPoint annotations. 
+- We can use Fragment constructor injection , using Hilt. 
+## Some Testing Tips for Hilt 
+    - 
+        
+
 
 
 

@@ -1,5 +1,6 @@
 package com.amandeep.hiltsample
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import com.google.android.material.snackbar.Snackbar
@@ -13,13 +14,14 @@ import android.view.MenuItem
 import com.amandeep.hiltsample.databinding.ActivityMainBinding
 import com.amandeep.hiltsample.hilt.Car
 import com.amandeep.hiltsample.hilt.Person
-import com.amandeep.hiltsample.hilt.interfaceproblemwithinject.Bike
+import com.amandeep.hiltsample.hilt.interfaceproblemwithinject.ObjectWithSameReturnType
 import com.amandeep.hiltsample.hilt.interfaceproblemwithinject.SomeInterfaceImpl
 import com.amandeep.hiltsample.hilt.interfaceproblemwithinject.Vehicle
 import com.amandeep.hiltsample.hilt.sample.People
 import com.amandeep.hiltsample.hilt.sample.scoped.ActivityScopedSample
-import com.amandeep.hiltsample.hilt.sample.scoped.FragmentScopedSample
 import com.amandeep.hiltsample.hilt.sample.scoped.ScopedSample
+import com.amandeep.hiltsample.nonHiltClass.NonHiltClassEntrypointInterface
+import dagger.hilt.EntryPoints
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -36,6 +38,8 @@ class MainActivity : AppCompatActivity() {
     @Inject lateinit var activityScoped: ActivityScopedSample
     @Inject lateinit var vehicle: Vehicle
     @Inject lateinit var someInterfaceImpl: SomeInterfaceImpl
+    // this one is used how we use the same object in two different activity or kind of named parameters.
+    @Inject lateinit var twoDiffObject:ObjectWithSameReturnType
 
     // this can be using in Fargment only
   //  @Inject lateinit var fargmentScopedSample: FragmentScopedSample
@@ -61,15 +65,19 @@ class MainActivity : AppCompatActivity() {
         Log.e(TAG, "onCreate: Application scope ${scopedSample.getScopedFunction()}")
         Log.e(TAG, "onCreate: Activity scope ${activityScoped.getScopedFunction()}")
 
-        Log.e(TAG, "onCreate: getVehicle = ${vehicle.getVehicleDetails()}")
+        Log.e(TAG, "onCreate: getVehicle = ${vehicle.getBikeDetails()}")
         Log.e(TAG, "onCreate: some Object dependency = ${someInterfaceImpl.getDetails()}")
+
+        Log.e(TAG, "onCreate: Object with two same type = ${twoDiffObject.getImpl1()}")
+        Log.e(TAG, "onCreate: Object with two same type = ${twoDiffObject.getImpl2()}")
 
         binding.fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action ${car.getCar()}", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
+            getBothClass(this.application)
         }
 
-       // car.getCar()
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -96,13 +104,13 @@ class MainActivity : AppCompatActivity() {
 
 
 
-//    fun getBothClass(context: Context){
-//        val infetface=
-//            EntryPoints.get(context, NonHiltClassEntryPoint.NonHiltClassEntrypointInterface::class.java)
-//        val book= infetface.getBook()
-//        val item=infetface.getItem()
-//        Log.e("TAG", "getBothClass: Book ${book.getBookName()}" )
-//        Log.e("TAG", "getBothClass: Item  ${item.getItemName()}" )
-//
-//    }
+    fun getBothClass(context: Context){
+        val infetface=
+            EntryPoints.get(context, NonHiltClassEntrypointInterface::class.java)
+        val book= infetface.getBook()
+        val item=infetface.getItem()
+        Log.e("TAG", "getBothClass: Book ${book.getBookName()}" )
+        Log.e("TAG", "getBothClass: Item  ${item.getItemName()}" )
+
+    }
 }

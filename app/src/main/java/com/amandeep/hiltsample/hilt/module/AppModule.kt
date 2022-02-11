@@ -23,4 +23,20 @@ class AppModule {
     fun getDependencyImpl():SomeInterface{
         return SomeInterfaceImpl()
     }
+
+    @Impl1
+    @Provides
+    @Singleton
+    fun provideIGetThingDetails1():IGetThing{
+        return GetThingImpl1()
+    }
+
+    @Impl2
+    @Provides
+    @Singleton
+    fun provideIGetThingDetails2():IGetThing{
+        return GetThingImpl2()
+    }
+
+
 }
